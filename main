@@ -1,0 +1,168 @@
+import PIL
+from PIL import Image
+import numpy as np
+
+class imageMatrix:
+    def __init__(self, pixel, rgb):
+        self.pixel = pixel;
+        self.rgb = rgb;
+    def getpix(self):
+        return self.pixel;
+    def getrgb(self):
+        return self.rgb;
+
+'''
+pixel = list(image.getdata())
+pix = image.load()
+line = []
+
+matrix = []
+for i in range(height):
+    for j in range(width):
+        line.append(pix[i, j])
+    #print(line)
+    matrix.append(line)
+    line = []
+#print(matrix)
+matrix = np.array(matrix)
+#print(matrix)
+'''
+
+
+def sort(image):
+    less = []
+    equal = []
+    greater = []
+    if len(image) > 1:
+        pivot = image[0]
+        for x in range(len(image)):
+            if image[x] < pivot:
+                less.append(image[x])
+            if image[x] == pivot:
+                equal.append(image[x])
+            if image[x] > pivot:
+                greater.append(image[x])
+        # Don't forget to return something!
+        return sort(less)+equal+sort(greater)  # Just use the + operator to join lists
+    # Note that you want equal ^^^^^ not pivot
+    else:  # You need to hande the part at the end of the recursion - when you only have one element in your array, just return the array.
+        return image
+
+def sortrgb(image, imagergb):
+    less = []
+    lessrgb = []
+    equal = []
+    equalrgb = []
+    greater = []
+    greaterrgb = []
+    if len(image) > 1:
+        pivot = image[0]
+        for x in range(len(image)):
+            if image[x] < pivot:
+                less.append(image[x])
+                lessrgb.append(imagergb[x])
+            if image[x] == pivot:
+                equal.append(image[x])
+                equalrgb.append(imagergb[x])
+            if image[x] > pivot:
+                greater.append(image[x])
+                greaterrgb.append(imagergb[x])
+        # Don't forget to return something!
+        return sortrgb(less, lessrgb)+equalrgb+sortrgb(greater, greaterrgb)  # Just use the + operator to join lists
+    # Note that you want equal ^^^^^ not pivot
+    else:  # You need to hande the part at the end of the recursion - when you only have one element in your array, just return the array.
+        return imagergb
+
+def main():
+    image = Image.open("majesticlion.png", "r") #--> change this image to whatever you desire, 
+                                                #     must be png so far, will work on png converter
+
+    width, height = image.size
+
+    imagePercent = [];
+    imageRGB = [];
+    matrixrgbImage = [];
+    matrixImage = [];
+    for i in range(height):
+        for j in range(width):
+            r, g, b = image.getpixel((j, i))
+            redWeight = r*0.6;
+            greenWeight = g*0.3;
+            blueWeight = b*0.15;
+            totalWeight = float(redWeight+greenWeight+blueWeight);
+            imageRGB.append([r, g, b])
+            imagePercent.append(totalWeight);
+        temprgbList = sortrgb(imagePercent, imageRGB)
+        tempList = sort(imagePercent)
+        imagePercent = [];
+        imageRGB = [];
+        matrixrgbImage.append(temprgbList)
+        matrixImage.append(tempList)
+
+    newrgbImage = [];
+    newImage = [];
+    finalImage = []
+    for i in range(width):
+        for j in range(height):
+            newrgbImage.append(matrixrgbImage[j][i]);
+            newImage.append(matrixImage[j][i]);
+        newrgbImage = sortrgb(newImage, newrgbImage)
+        finalImage += newrgbImage
+        newrgbImage = []
+        newImage = []
+
+    finalImage = np.array(finalImage)
+    data = np.zeros((height, width, 3), dtype=np.uint8)
+    x = 0
+    for i in range(width):
+        for j in range(height):
+            data[j, i] = finalImage[x]
+            x += 1;
+    img = Image.fromarray(data, "RGB")
+    img.save("evenmoremajestic.png")
+    img.show()
+"""
+    w, h = 512, 512
+    data = np.zeros((h, w, 3), dtype=np.uint8)
+    for i in range(w):
+        for j in range(h):
+            data[i, j] = [255, 0, 0]
+    img = Image.fromarray(data, 'RGB')
+    img.save('my.png')
+"""
+
+if __name__ == "__main__":
+    main();
+
+"""
+r, g, b, a = (255, 0, 0, 0)
+redWeight = r*0.6;
+greenWeight = g*0.3;
+blueWeight = b*0.15;
+print(str(redWeight+greenWeight+blueWeight));
+r, g, b, a = (255, 255, 0, 0)
+redWeight = r*0.6;
+greenWeight = g*0.3;
+blueWeight = b*0.15;
+print(str(redWeight+greenWeight+blueWeight));
+r, g, b, a = (0, 255, 0, 0)
+redWeight = r*0.6;
+greenWeight = g*0.3;
+blueWeight = b*0.15;
+print(str(redWeight+greenWeight+blueWeight));
+r, g, b, a = (0, 255, 255, 0)
+redWeight = r*0.6;
+greenWeight = g*0.3;
+blueWeight = b*0.15;
+print(str(redWeight+greenWeight+blueWeight));
+r, g, b, a = (0, 0, 255, 0)
+redWeight = r*0.6;
+greenWeight = g*0.3;
+blueWeight = b*0.15;
+print(str(redWeight+greenWeight+blueWeight));
+r, g, b, a = (255, 0, 255, 0)
+redWeight = r*0.6;
+greenWeight = g*0.3;
+blueWeight = b*0.15;
+print(str(redWeight+greenWeight+blueWeight));
+"""
